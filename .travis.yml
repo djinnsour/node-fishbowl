@@ -1,7 +1,7 @@
 language: node_js
 node_js:
-  - "4.2"
-  - "5.1"
+  - "6.11.1"
+  - "8.1.4"
 
 env:
   - CXX=g++-4.8
@@ -16,8 +16,6 @@ addons:
 install:
   - npm install
   - npm install typescript -g
-  - npm install tsd -g
-  - tsd install
 
 before_script:
   - npm run dist
