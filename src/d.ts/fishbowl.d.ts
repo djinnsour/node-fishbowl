@@ -4,12 +4,15 @@
 interface fbApiCall {
   action: string;
   params: any;
+  formatValues?: (_:string) => string
 }
 
 /**
 * Format of CSV response in fbApiResponse
 */
 interface fbCsvResponse {
+  statusCode: string;
+  statusMessage?: string;
   Rows: {
     Row: any[]
   }
@@ -55,3 +58,6 @@ interface fbReturnToRestify {
   json: any
 }
 
+interface formatOptions {
+  capitalize?: boolean;
+}

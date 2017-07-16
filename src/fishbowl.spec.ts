@@ -235,6 +235,20 @@ describe('Fishbowl Library', ()=> {
           }
         }).should.equal('<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE FbiXml><FbiXml><Ticket><Key></Key></Ticket><FbiMsgsRq><fbRequest><userId>232</userId></fbRequest></FbiMsgsRq></FbiXml>');
       });
+      it('should accept a formatting function for values', ()=> {
+        function capitalize(a) {
+          return a.toUpperCase();
+        }
+
+        fb.token = "testToken";
+        fb.json2fbXml({
+          action: 'fbRequest',
+          params: {
+            userId: 'testUser'
+          },
+          formatValues: capitalize
+        }).should.equal('<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE FbiXml><FbiXml><Ticket><Key>testToken</Key></Ticket><FbiMsgsRq><fbRequest><userId>TESTUSER</userId></fbRequest></FbiMsgsRq></FbiXml>');
+      })
     });
 
     describe('jsonTFunction', ()=> {
@@ -279,11 +293,25 @@ describe('Fishbowl Library', ()=> {
           }
         });
       });
+      it('should correctly pass formatting function to sanitizeAndFormat', ()=> {
+        function capitalize(a: string) {
+          return a.toUpperCase();
+        }
+
+        fb.jsonTFunction({
+          testKey: 'testVal'
+        }, capitalize).should.deep.equal({
+          testKey: {
+            '$t': 'TESTVAL'
+          }
+        });
+      });
     });
 
     describe('notCSVtoJson', ()=> {
       it('should exclude rows that are empty', (done)=> {
         fb.notCSVtoJson({
+          statusCode: '1000',
           Rows: {
             Row: [
               'HEAD1,HEAD2',
@@ -302,6 +330,7 @@ describe('Fishbowl Library', ()=> {
       });
       it('should return an error on csv library error', (done)=> {
         fb.notCSVtoJson({
+          statusCode: '1000',
           Rows: {
             Row: [
               'HEAD",HE,,AD',
@@ -316,6 +345,7 @@ describe('Fishbowl Library', ()=> {
       });
       it('should return a json object to the callback on success', (done)=> {
         fb.notCSVtoJson({
+          statusCode: '1000',
           Rows: {
             Row: [
               'HEAD1,HEAD2',
@@ -430,18 +460,25 @@ describe('Fishbowl Library', ()=> {
       });
     });
 
-    describe('xmlSanitize', ()=> {
+    describe('sanitizeAndFormat', ()=> {
       it('should remove/replace &', ()=> {
-        fb.xmlSanitize('Test&String').should.equal('Test&amp;String');
+        fb.sanitizeAndFormat('Test&String').should.equal('Test&amp;String');
       });
       it('should remove/replace <', ()=> {
-        fb.xmlSanitize('Test<String').should.equal('Test&lt;String');
+        fb.sanitizeAndFormat('Test<String').should.equal('Test&lt;String');
       });
       it('should remove/replace >', ()=> {
-        fb.xmlSanitize('Test>String').should.equal('Test&gt;String');
+        fb.sanitizeAndFormat('Test>String').should.equal('Test&gt;String');
       });
       it('should replace multiple instances of a string', ()=> {
-        fb.xmlSanitize('Test&Strin&').should.equal('Test&amp;Strin&amp;');
+        fb.sanitizeAndFormat('Test&Strin&').should.equal('Test&amp;Strin&amp;');
+      })
+      it('should use the format function if present', ()=> {
+        function capitalize(a: string) {
+          return a.toUpperCase();
+        }
+
+        fb.sanitizeAndFormat('Test>String', capitalize).should.equal('TEST&gt;STRING');
       })
     });
 

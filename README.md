@@ -27,6 +27,11 @@ var fb = new Fishbowl.Fishbowl({
     bunyanLevel: 'debug'
 });
 ```
+If your javascript engine does not follow the new ES6 import model, you
+will need to call the default export manually.
+
+`var Fishbowl = require('node-fishbowl').default;`
+
 
 With Typescript:
 ```js
@@ -66,7 +71,7 @@ fb.sendRequest({
     action: 'ApiCallName',
     params: {
       XMLKey1: XMLValue1,
-      XMLKey2: XMLVale2
+      XMLKey2: XMLValue2
     }
 });
 
@@ -78,6 +83,33 @@ fb.sendRequest({
     }
 });
 ```
+
+### Formatting Values
+There is also an option to format all values that get passed to Fishbowl. This was created
+so that I could capitalize everything before sending, but could be used for all kinds of things.
+
+```js
+
+function capitalize(a) {
+  return a.toUpperCase();   
+}
+
+fb.sendRequest({
+    action: 'ApiCallName',
+    params: {
+      XMLKey1: XMLValue1,
+      XMLKey2: XMLValue2
+    },
+    formatValues: capitalize
+});
+
+/* Will Send
+  <XMLKey1>XMLVALUE1</XMLKey1>
+  <XMLKey2>XMLVALUE2</XMLKey2> */
+```
+
+
+
 
 ## Help!
 This was a pain to get working.  There are a lot of quirks that I had to work through.  If you're having issues, open a ticket and I'll try to help as much as I can.  I also wrote a handful of hints in the Wiki but not in a clear format yet. Feel free to poke around there as well.   

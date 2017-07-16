@@ -221,7 +221,7 @@ export default class Fishbowl {
   */
   json2fbXml(json: fbApiCall): string {
     var reqObject = {};
-    reqObject[json.action] = this.jsonTFunction(json.params);
+    reqObject[json.action] = this.jsonTFunction(json.params, json.formatValues);
 
     //Then return request with header
     return '<?xml version="1.0" encoding="UTF-8"?>' +
@@ -245,17 +245,17 @@ export default class Fishbowl {
   @param {object} obj The object to transform
   @return Processed object
   */
-  jsonTFunction(obj: any): any {
+  jsonTFunction(obj: any, formatFn?: (_:string) => string): any {
     return _.mapValues(obj, (cV) => {
       if (Array.isArray(cV) === true) {
         return _.map(cV, (cV2)=> {
-          return this.jsonTFunction(cV2);
+          return this.jsonTFunction(cV2, formatFn);
         });
       } else if (typeof cV === 'object') {
-        return this.jsonTFunction(cV);
+        return this.jsonTFunction(cV, formatFn);
       } else {
         return {
-          '$t': this.xmlSanitize(cV)
+          '$t': this.sanitizeAndFormat(cV, formatFn)
         };
       }
     });
@@ -440,34 +440,28 @@ export default class Fishbowl {
   }
 
   /**
-  Returns a sanitized XML string
+  Returns a sanitized and formatted XML string
   @private
   @param {string} xmlString XML string to process
+  @param {object} options Extra options to process values
   @return {string} Returns sanitized XML string
   */
-  xmlSanitize(xmlString: string): string {
+  sanitizeAndFormat(xmlString: string, formatFn?: (_:string) => string): string {
+    //Load default values for extra processing if not present
+    if (_.isUndefined(formatFn) === false) {
+      xmlString = formatFn(xmlString);
+    }
+
+    //Check to see if we need to replace values
     var saniReg = /[&<>]/; //The chars we are checking for
     if (saniReg.test(xmlString) === true) {
-      var saniMap = [{
-        search: '&',            //If '&' isn't first, you're going to have a bad time
-        sanitized: '&amp;'
-      }, {
-        search: '<',
-        sanitized: '&lt;'
-      }, {
-        search: '>',
-        sanitized: '&gt;'
-      }];
-
-      saniMap.forEach((cV)=> {
-        xmlString = xmlString.replace(new RegExp(cV.search, 'g'), cV.sanitized);
-      });
+      //If & isn't first, you're going to have a bad time.
+      xmlString = xmlString.replace(new RegExp('&', 'g'), '&amp;');
+      xmlString = xmlString.replace(new RegExp('<', 'g'), '&lt;');
+      xmlString = xmlString.replace(new RegExp('>', 'g'), '&gt;');
     }
 
     return xmlString;
   }
-
-
-
 }
 
