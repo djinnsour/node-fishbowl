@@ -1,6 +1,6 @@
 # node-fishbowl
 
-`node-fishbowl` was created as a communication tool between node and [Fishbowl Inventory](https://www.fishbowlinventory.com/).  Useage is as easy as:
+`node-fishbowl` was created as a communication tool between node and [Fishbowl Inventory](https://www.fishbowlinventory.com/).  Usage is as easy as:
 
 ```bash
 npm install node-fishbowl --save
