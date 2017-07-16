@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-      "module": "commonjs",
       "rootDir": "src",
       "outDir": "build",
       "removeComments": true,

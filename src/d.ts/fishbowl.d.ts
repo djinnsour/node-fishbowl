@@ -31,6 +31,9 @@ interface fbApiResponse {
       ExecuteQueryRs?: {
         statusCode: string;
         statusMessage?: string;
+        Rows: {
+          Row: any[]
+        }
       },
       LoginRs?: {
         statusCode: string;

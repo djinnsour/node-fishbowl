@@ -1,5 +1,3 @@
-/// <reference path="../typings/tsd.d.ts"/>
-
 //Testing modules
 import chai = require('chai');
 var should = chai.should();
@@ -119,7 +117,10 @@ describe('Fishbowl Library', ()=> {
               statusCode: '1000',
               ExecuteQueryRs: {
                 statusCode: '1002',
-                statusMessage: 'There was an error.'
+                statusMessage: 'There was an error.',
+                Rows: {
+                  Row: []
+                }
               }
             },
           }

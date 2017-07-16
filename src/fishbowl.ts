@@ -56,7 +56,7 @@ export default class Fishbowl {
   isConnected: boolean = false;
   isWaiting: boolean = false;
   reqQueue: any[] = [];
-  log: bunyan.Logger;
+  log: bunyan;
 
   constructor(opts?) {
     opts = _.defaults(opts || {}, {
