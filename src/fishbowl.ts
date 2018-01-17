@@ -248,10 +248,19 @@ export default class Fishbowl {
   jsonTFunction(obj: any, formatFn?: (_:string) => string): any {
     return _.mapValues(obj, (cV) => {
       if (Array.isArray(cV) === true) {
-        return _.map(cV, (cV2)=> {
-          return this.jsonTFunction(cV2, formatFn);
-        });
-      } else if (typeof cV === 'object') {
+        // If it's an array of regular objects, then we're done. Format and
+        // pass it on. This is showing itself as Fishbowl moves to the
+        // CSV imports Rows: Row: []
+        if (_.isObjectLike(cV[0])) {
+          return _.map(cV, (cV2: object) => {
+            return this.jsonTFunction(cV2, formatFn);
+          });
+        } else {
+          return _.map(cV, (cV2: string) => {
+            return { '$t': this.sanitizeAndFormat(cV2, formatFn) }
+          });
+        }
+      } else if (_.isObjectLike(cV)) {
         return this.jsonTFunction(cV, formatFn);
       } else {
         return {

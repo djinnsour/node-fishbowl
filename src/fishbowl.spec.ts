@@ -306,6 +306,27 @@ describe('Fishbowl Library', ()=> {
           }
         });
       });
+      it('should turn an array value into a set of rows', ()=> {
+        fb.jsonTFunction({
+          Rows: {
+            Row: [
+              'a', 'b', 'c'
+            ]
+          }
+        }).should.deep.equal({
+          Rows: {
+            Row : [{
+              '$t': 'a'
+            }, {
+              '$t': 'b'
+            }, {
+              '$t': 'c'
+            }]
+            }
+          });
+
+        });
+
     });
 
     describe('notCSVtoJson', ()=> {
