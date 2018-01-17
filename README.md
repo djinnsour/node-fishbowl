@@ -16,7 +16,7 @@ Without Typescript:
 var Fishbowl = require('node-fishbowl');
 
 //Create new instance
-var fb = new Fishbowl.Fishbowl({
+var fb = new Fishbowl({
     host: '127.0.0.1',
     IADescription: 'A node wrapper for Fishbowl Inventory',
     IAID: 2286,
@@ -39,7 +39,7 @@ With Typescript:
 import Fishbowl = require('node-fishbowl');
 
 //Create new instance
-var fb = new Fishbowl.Fishbowl({
+var fb = new Fishbowl({
     host: '127.0.0.1',
     IADescription: 'A node wrapper for Fishbowl Inventory',
     IAID: 2286,
