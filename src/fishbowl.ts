@@ -451,23 +451,28 @@ export default class Fishbowl {
   /**
   Returns a sanitized and formatted XML string
   @private
-  @param {string} xmlString XML string to process
-  @param {object} options Extra options to process values
+  @param {any} xmlString XML string to process
+  @param {function(_:any): any} formatFn Extra options to process values
   @return {string} Returns sanitized XML string
   */
-  sanitizeAndFormat(xmlString: string, formatFn?: (_:string) => string): string {
+  sanitizeAndFormat(xmlString: any, formatFn?: (_:any) => any): string {
     //Load default values for extra processing if not present
     if (_.isUndefined(formatFn) === false) {
       xmlString = formatFn(xmlString);
     }
 
-    //Check to see if we need to replace values
-    var saniReg = /[&<>]/; //The chars we are checking for
-    if (saniReg.test(xmlString) === true) {
-      //If & isn't first, you're going to have a bad time.
-      xmlString = xmlString.replace(new RegExp('&', 'g'), '&amp;');
-      xmlString = xmlString.replace(new RegExp('<', 'g'), '&lt;');
-      xmlString = xmlString.replace(new RegExp('>', 'g'), '&gt;');
+    // Only process below if it's a string.
+    if (_.isString(xmlString)) {
+      //Check to see if we need to replace values
+      var saniReg = /[&<>]/; //The chars we are checking for
+      if (saniReg.test(xmlString) === true) {
+        //If & isn't first, you're going to have a bad time.
+        xmlString = xmlString.replace(new RegExp('&', 'g'), '&amp;');
+        xmlString = xmlString.replace(new RegExp('<', 'g'), '&lt;');
+        xmlString = xmlString.replace(new RegExp('>', 'g'), '&gt;');
+      }
+    } else {
+      xmlString = xmlString.toString();
     }
 
     return xmlString;
