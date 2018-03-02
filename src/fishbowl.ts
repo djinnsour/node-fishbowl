@@ -1,13 +1,13 @@
 //Load Native Modules
-import crypto = require('crypto');
-import path = require('path');
-import net = require('net');
+import * as crypto from 'crypto';
+import * as path from 'path';
+import * as net from 'net';
 
 //Load third party modules
-import bunyan = require('bunyan');
-import _ = require('lodash');
-var xmlParser = require('xml2json');
-var csv = require('csv');
+import * as bunyan from 'bunyan';
+import * as _ from 'lodash';
+import * as xmlParser from 'xml2json';
+import * as csvParse from 'csv-parse';
 
 //Load error codes
 var errList = require('../lib/resCodes.json');
@@ -349,7 +349,7 @@ export default class Fishbowl {
             });
         }
 
-        var retObject = csv.parse(csvString, { columns: true }, (err, pObj) => {
+        var retObject = csvParse(csvString, { columns: true }, (err, pObj) => {
             if (err) {
                 return cb(err, null);
             }
@@ -463,7 +463,7 @@ export default class Fishbowl {
                 var resJson = xmlParser.toJson(resData.toString('utf8'), {
                     sanitize: false,
                     object: true
-                });
+                }) as fbApiResponse;                      //xml2json typed as empty object. This corrects that
                 resLength = undefined;                    //Reset length to get ready for next response
 
                 //Sometimes the server will disconnect us for inactivity.  We need to

@@ -12,15 +12,21 @@
   "author": "Kyle Baldwin <kwb@mail.sfsu.edu> (http://kylebaldw.in)",
   "license": "MIT",
   "dependencies": {
+    "@types/bunyan": "^1.8.4",
+    "@types/csv-parse": "^1.1.11",
+    "@types/lodash": "^4.14.104",
+    "@types/xml2json": "^0.10.0",
     "bunyan": "^1.8.12",
-    "csv": "^2.0.0",
+    "csv-parse": "^2.0.4",
     "lodash": "^4.17.5",
+    "rxjs": "^5.5.6",
     "xml2json": "^0.11.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
     "@types/mocha": "^2.2.48",
     "@types/node": "^9.4.6",
+    "@types/sinon": "^4.3.0",
     "chai": "^4.1.2",
     "mocha": "^5.0.1",
     "sinon": "^4.4.2"

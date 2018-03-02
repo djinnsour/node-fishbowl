@@ -1,11 +1,12 @@
 //Testing modules
-import chai = require('chai');
-var should = chai.should();
-import sinon = require('sinon');
-import bunyan = require('bunyan');
+import * as chai from 'chai';
+const should = chai.should();
+
+import * as sinon from 'sinon';
+import * as bunyan from 'bunyan';
 
 //Server modules
-import net = require('net');
+import * as net from 'net'; 
 
 //Fishbowl Library
 import Fishbowl from './fishbowl'

@@ -3,8 +3,9 @@
       "rootDir": "src",
       "outDir": "build",
       "removeComments": true,
-      "target": "es5",
-      "declaration": true
+      "target": "es6",
+      "declaration": true,
+      "module": "CommonJS"
     },
     "files": ["./src/fishbowl.ts",
               "./src/fishbowl.spec.ts"]
