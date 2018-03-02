@@ -100,9 +100,7 @@ export default class Fishbowl {
     bunyanLevel: string;
     token: string = '';
     userId: string = '';
-    //conn: net.Socket;  //The next line is any as the current node typings are missing
-    //listenerCount. When they typings are correct, this can be changed to net.Socket
-    conn: any;
+    conn: net.Socket;
     isConnected: boolean = false;
     isWaiting: boolean = false;
     reqQueue: any[] = [];
@@ -443,7 +441,7 @@ export default class Fishbowl {
                 this.log.error(e);
                 this.conn.emit('done', e, null);
             } else {
-                throw new Error(e);
+                throw e;
             }
         });
 
