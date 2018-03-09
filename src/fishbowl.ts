@@ -16,52 +16,65 @@ var errList = require('../lib/resCodes.json');
 /**
 * Call to the Fishbowl Server
 */
-export interface fbApiCall {
+export interface ApiCallRq {
     action: string;
     params: any;
     formatValues?: (_: string) => string
 }
 
 /**
-* Format of CSV response in fbApiResponse
+* Both the main call and the sub call have a status field.
+* This is the base class for both of them.
 */
-export interface fbCsvResponse {
-    statusCode: string;
-    statusMessage?: string;
-    Rows: {
-        Row: any[]
-    }
+export interface ApiMsgStatus {
+  statusCode: string;
+  statusMessage?: string;
 }
 
 /**
-* Response from the Fishbowl Server
+* Ticket that contains the logged in user information.
 */
-export interface fbApiResponse {
+export interface UserTicket {
+  Key: string;
+  UserID: string;
+}
+
+/**
+* There are two main responses we will get.  The first is a regular object
+* from the parsed XML.  The second is a CSV response that gets parsed before
+* being sent back to the requesting call.  This is the CSV Response.
+*/
+export interface ApiMsgQueryRs extends ApiMsgStatus {
+  Rows: {
+    Row: Array<string>;
+  }
+}
+
+/**
+* The other response will just have a regular object and it's not important
+* what it's called.
+*/
+export interface ApiMsgRegularRs extends ApiMsgStatus { }
+
+/**
+* This pains me. I know this isn't typed corectly.
+* This can respond with any number of keys for the various responses.
+* However, if I use a union type, it tries to apply the string that the object.
+* In the code the child is found elimination. This is, unfortunately, the best
+* I can do for now.  Please send a pull request if you can make this better. */
+export interface ApiMsg extends ApiMsgStatus {
+  ExecuteQueryRs?: ApiMsgQueryRs,
+  LoginRs?: ApiMsgRegularRs
+}
+
+/**
+* This is the row object returned from the parsing of the XML
+* received from the Fishbowl Server.
+*/
+export interface RawApiRs {
     FbiXml: {
-        Ticket?: {
-            Key: string;
-            UserID: string;
-        }
-        FbiMsgsRs: {
-            statusCode: string;
-            statusMessage?: string;
-            //Different types of responses...
-            ExecuteQueryRs?: {
-                statusCode: string;
-                statusMessage?: string;
-                Rows: {
-                    Row: any[]
-                }
-            },
-            LoginRs?: {
-                statusCode: string;
-                statusMessage?: string;
-            },
-            CustomerSaveRs?: {
-                statusCode: string;
-                statusMessage?: string;
-            }
-        }
+        Ticket?: UserTicket,
+        FbiMsgsRs: ApiMsg
     }
 }
 
@@ -185,11 +198,12 @@ export default class Fishbowl {
                          this is the res for restify.
     @return {void} Calls callback in params.
     */
-    errorCheckandFormat(err: string, data: fbApiResponse, cb: (err: string, data: fbApiResponse) => void): void {
+    errorCheckandFormat(err: string, data: RawApiRs, cb: (err: string, data: RawApiRs) => void): void {
         if (err) {
             //If this error is set, we just need to pass it on.
             return cb(err, null);
         }
+
         /**
         There are two status messages sent back by the Fishbowl server.  One
         located under FbiXml>FbiMsgsRs>statusCode and a second under
@@ -267,7 +281,7 @@ export default class Fishbowl {
     @param {object} json JSON request object.
     @return XML string
     */
-    json2fbXml(json: fbApiCall): string {
+    json2fbXml(json: ApiCallRq): string {
         var reqObject = {};
         reqObject[json.action] = this.jsonTFunction(json.params, json.formatValues);
 
@@ -327,7 +341,7 @@ export default class Fishbowl {
     @param {function} cb The callback function with CSV->JSON object when done
     @return Executes callback function with results.
     */
-    notCSVtoJson(notCSV: fbCsvResponse, cb: (err: string, JsonFromCsv: any) => void) {
+    notCSVtoJson(notCSV: ApiMsgQueryRs, cb: (err: string, JsonFromCsv: any) => void) {
         //If there is not an array, there were no results. Really, I think, this
         //should be changed as there should always be one row with the
         //column headers... TBD
@@ -362,7 +376,7 @@ export default class Fishbowl {
     @param {function} cb Callback function containing results of request
     @return {function} Calls the callback with response.
     */
-    sendRequest(requestJson: fbApiCall, cb: (err: string, json: fbApiResponse) => void): void {
+    sendRequest(requestJson: ApiCallRq, cb: (err: string, json: RawApiRs) => void): void {
         //If it's not a login and we're trying to work then catch it.
         if ((this.isWaiting === true) && (requestJson.action !== 'LoginRq')) {
             this.reqQueue.push({
@@ -379,7 +393,7 @@ export default class Fishbowl {
         if (this.isConnected === true) {
             //Set up one time listener for 'done'. 'done' is emitted when a complete
             //message is recieved from the Fishbowl server
-            this.conn.once('done', (err, data: fbApiResponse) => {
+            this.conn.once('done', (err, data: RawApiRs) => {
                 this.errorCheckandFormat(err, data, cb);
                 //If we're logging in, don't send the next request until we add our ticket.
                 if (typeof data.FbiXml.FbiMsgsRs.LoginRs === 'undefined') {
@@ -461,7 +475,7 @@ export default class Fishbowl {
                 var resJson = xmlParser.toJson(resData.toString('utf8'), {
                     sanitize: false,
                     object: true
-                }) as fbApiResponse;                      //xml2json typed as empty object. This corrects that
+                }) as RawApiRs;                      //xml2json typed as empty object. This corrects that
                 resLength = undefined;                    //Reset length to get ready for next response
 
                 //Sometimes the server will disconnect us for inactivity.  We need to
@@ -485,7 +499,7 @@ export default class Fishbowl {
     @param {object} json The object carrying the login response details
     @return {void}
     */
-    setUser(err: string, json: fbApiResponse): void {
+    setUser(err: string, json: RawApiRs): void {
         //If error
         if (err) {
             this.log.error(`There was a problem logging in. ${err}`);

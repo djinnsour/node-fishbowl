@@ -6,7 +6,7 @@ import * as sinon from 'sinon';
 import * as bunyan from 'bunyan';
 
 //Server modules
-import * as net from 'net'; 
+import * as net from 'net';
 
 //Fishbowl Library
 import Fishbowl from './fishbowl'
@@ -330,7 +330,7 @@ describe('Fishbowl Library', () => {
 
         describe('notCSVtoJson', () => {
             it('should exclude rows that are empty', (done) => {
-                fb.notCSVtoJson({
+                fb.notCSVtoJson(({
                     statusCode: '1000',
                     Rows: {
                         Row: [
@@ -339,7 +339,8 @@ describe('Fishbowl Library', () => {
                             'VAL1,VAL2'
                         ]
                     }
-                }, (err, json) => {
+                  // Overwrite typing because we're testing a non-standard case 
+                } as any), (err, json) => {
                     should.not.exist(err);
                     json.should.deep.equal([{
                         'HEAD1': 'VAL1',
